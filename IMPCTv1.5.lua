@@ -237,6 +237,32 @@ local function CreatePlayerList(parent)
 end
 
 -----------------------------------------------------------
+-- SISTEMA DE ESP FRUIT (VISUAL)
+-----------------------------------------------------------
+local FruitESP_Enabled = false
+local ESP_Objects = {}
+
+local function CreateFruitESP(fruit)
+    if not fruit:FindFirstChild("Handle") then return end
+    
+    local Billboard = Instance.new("BillboardGui")
+    Billboard.Name = "FruitESP"
+    Billboard.AlwaysOnTop = true
+    Billboard.Size = UDim2.new(0, 100, 0, 50)
+    Billboard.Adornee = fruit:FindFirstChild("Handle")
+    Billboard.Parent = fruit
+    
+    local Label = Instance.new("TextLabel")
+    Label.Size = UDim2.new(1, 0, 1, 0)
+    Label.BackgroundTransparency = 1
+    Label.Text = "🍎 " .. fruit.Name
+    Label.TextColor3 = Color3.fromRGB(255, 50, 50)
+    Label.Font = Enum.Font.GothamBold
+    Label.TextSize = 14
+    Label.Parent = Billboard
+end
+
+-----------------------------------------------------------
 -- ADICIONE SEUS JOGOS E SCRIPTS AQUI
 -----------------------------------------------------------
 
@@ -270,47 +296,66 @@ AddGameTab("UNIVERSAL", {
 
 -- ABA 4: BLOX FRUITS
 
-local ListFruit = {
-    'Diamond','Light-Light','Shadow-Shadow','Portal-Portal','Spider-Spider','Gravity-Gravity',
-    'Spin-Spin','Revive-Revive','Bird-Bird: Phoenix','Rubber-Rubber','Spring-Spring',
-    'Blizzard-Blizzard','Dough-Dough','Bomb-Bomb','Venom-Venom','Bird-Bird: Falcon',
-    'Spirit-Spirit','Love-Love','Leopard-Leopard','Dragon-Dragon','Spike-Spike',
-    'Magma-Magma','Control-Control','Flame-Flame','Rumble-Rumble','Dark-Dark',
-    'Chop-Chop','Quake-Quake','Buddha-Buddha','Barrier-Barrier',"Rocket-Rocket",
-    "Sound-Sound","Pain-Pain","Mammoth-Mammoth","Kitsune-Kitsune","T-Rex-T-Rex"
-}
-
 AddGameTab("BLOX FRUITS", {
     {
-        Name = "Ver Frutas no Chão", 
+        Name = "ESP Frutas (ON/OFF)", 
         Func = function() 
-            local found = false
+            FruitESP_Enabled = true -- Ativa o loop de busca
             for _, v in pairs(workspace:GetChildren()) do
-                if v:IsA("Tool") and v.Name:find("Fruit") then
-                    print("🍎 FRUTA ENCONTRADA: " .. v.Name .. " em " .. tostring(v.Handle.Position))
-                    found = true
+                if v:IsA("Tool") and (v.Name:find("Fruit") or v:FindFirstChild("Handle")) then
+                    if not v:FindFirstChild("FruitESP") then
+                        CreateFruitESP(v)
+                    end
                 end
             end
-            if not found then print("❌ Nenhuma fruta spawnada no servidor.") end
+            task.wait(2) -- Atualiza a cada 2 segundos para não dar lag
         end
     },
     {
-        Name = "Ver Estoque (Loja)", 
+        Name = "Ver Estoque (Pop-up)", 
         Func = function() 
-            -- Tenta ler o estoque remoto do jogo
+            -- Criando uma Janela de Pop-up (Aba Extra)
+            local PopUp = Instance.new("Frame")
+            PopUp.Size = UDim2.new(1, 0, 1, 0)
+            PopUp.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+            PopUp.ZIndex = 10
+            PopUp.Parent = PagesContainer -- Abre dentro do seu menu atual
+
+            local CloseBtn = Instance.new("TextButton")
+            CloseBtn.Size = UDim2.new(1, 0, 0, 30)
+            CloseBtn.Text = "[ FECHAR ESTOQUE ]"
+            CloseBtn.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
+            CloseBtn.TextColor3 = Color3.new(1,1,1)
+            CloseBtn.Parent = PopUp
+            CloseBtn.MouseButton1Click:Connect(function() PopUp:Destroy() end)
+
+            local StockList = Instance.new("ScrollingFrame")
+            StockList.Position = UDim2.new(0,0,0,35)
+            StockList.Size = UDim2.new(1,0,1,-35)
+            StockList.BackgroundTransparency = 1
+            StockList.Parent = PopUp
+            Instance.new("UIListLayout", StockList)
+
+            -- Pegando Estoque Real
             local success, stock = pcall(function() 
                 return game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("GetFruits") 
             end)
-            
-            if success and stock then
-                print("--- 🏪 ESTOQUE ATUAL ---")
-                for _, fruit in pairs(stock) do
-                    if fruit.OnSale then
-                        print("✅ " .. fruit.Name .. " | Preço: $" .. fruit.Price)
+
+            if success and type(stock) == "table" then
+                for _, f in pairs(stock) do
+                    if f.OnSale then
+                        local l = Instance.new("TextLabel")
+                        l.Size = UDim2.new(1,0,0,25)
+                        l.Text = f.Name .. " - $" .. f.Price
+                        l.TextColor3 = Color3.new(1,1,1)
+                        l.BackgroundTransparency = 1
+                        l.Parent = StockList
                     end
                 end
             else
-                print("⚠️ Não foi possível ler o estoque (Você precisa estar no jogo).")
+                local err = Instance.new("TextLabel")
+                err.Text = "Erro ao carregar (Vá para o Jogo)"
+                err.Parent = StockList
             end
         end
     }
