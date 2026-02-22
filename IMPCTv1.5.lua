@@ -2,40 +2,34 @@
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 
--- CRIAÇÃO DA INTERFACE PRINCIPAL
+-- CONFIGURAÇÃO DA GUI
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "ModernMenu"
+ScreenGui.Name = "ModernToggleMenu"
 ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
 
--- FRAME PRINCIPAL (O MENU)
 local MainFrame = Instance.new("Frame")
-MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 250, 0, 350)
-MainFrame.Position = UDim2.new(0.5, -125, 0.5, -175)
-MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
-MainFrame.BorderSizePixel = 0
+MainFrame.Size = UDim2.new(0, 260, 0, 380)
+MainFrame.Position = UDim2.new(0.5, -130, 0.5, -190)
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
 MainFrame.Parent = ScreenGui
 
--- BORDAS ARREDONDADAS
 local UICorner = Instance.new("UICorner")
-UICorner.CornerRadius = UDim.new(0, 10)
+UICorner.CornerRadius = UDim.new(0, 12)
 UICorner.Parent = MainFrame
 
--- TÍTULO
 local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, 0, 0, 40)
-Title.BackgroundTransparency = 1
-Title.Text = "HUB DE SCRIPTS"
+Title.Size = UDim2.new(1, 0, 0, 50)
+Title.Text = "MODERN HUB"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.Font = Enum.Font.GothamBold
-Title.TextSize = 18
+Title.TextSize = 20
+Title.BackgroundTransparency = 1
 Title.Parent = MainFrame
 
--- CONTAINER DOS BOTÕES (LISTA AUTOMÁTICA)
 local ButtonList = Instance.new("ScrollingFrame")
-ButtonList.Size = UDim2.new(1, -20, 1, -60)
-ButtonList.Position = UDim2.new(0, 10, 0, 50)
+ButtonList.Size = UDim2.new(1, -20, 1, -70)
+ButtonList.Position = UDim2.new(0, 10, 0, 60)
 ButtonList.BackgroundTransparency = 1
 ButtonList.ScrollBarThickness = 2
 ButtonList.CanvasSize = UDim2.new(0, 0, 0, 0)
@@ -43,79 +37,94 @@ ButtonList.Parent = MainFrame
 
 local UIListLayout = Instance.new("UIListLayout")
 UIListLayout.Parent = ButtonList
-UIListLayout.Padding = UDim.new(0, 8)
+UIListLayout.Padding = UDim.new(0, 10)
 UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
 -----------------------------------------------------------
--- SISTEMA DE FUNÇÕES (COMO ADICIONAR NOVOS SCRIPTS)
+-- SISTEMA DE INTERRUPTORES (TOGGLES)
 -----------------------------------------------------------
 
-local function CreateButton(name, callback)
-	local Button = Instance.new("TextButton")
-	Button.Size = UDim2.new(1, -10, 0, 40)
-	Button.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
-	Button.Text = name
-	Button.TextColor3 = Color3.fromRGB(200, 200, 200)
-	Button.Font = Enum.Font.Gotham
-	Button.TextSize = 14
-	Button.AutoButtonColor = true
-	Button.Parent = ButtonList
-	
-	local Corner = Instance.new("UICorner")
-	Corner.CornerRadius = UDim.new(0, 6)
-	Corner.Parent = Button
-	
-	-- Efeito de Hover (Mouse em cima)
-	Button.MouseEnter:Connect(function()
-		TweenService:Create(Button, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(60, 60, 70), TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
-	end)
-	
-	Button.MouseLeave:Connect(function()
-		TweenService:Create(Button, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(45, 45, 50), TextColor3 = Color3.fromRGB(200, 200, 200)}):Play()
-	end)
+local function CreateToggle(name, scriptFunc)
+    local active = false
+    
+    local Button = Instance.new("TextButton")
+    Button.Size = UDim2.new(1, -10, 0, 45)
+    Button.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+    Button.Text = name .. ": OFF"
+    Button.TextColor3 = Color3.fromRGB(200, 200, 200)
+    Button.Font = Enum.Font.GothamMedium
+    Button.TextSize = 14
+    Button.AutoButtonColor = false
+    Button.Parent = ButtonList
+    
+    local Corner = Instance.new("UICorner")
+    Corner.CornerRadius = UDim.new(0, 8)
+    Corner.Parent = Button
 
-	-- Ativação
-	Button.MouseButton1Click:Connect(function()
-		task.spawn(callback) -- Roda o script sem travar o menu
-		Button.Text = "ATIVADO!"
-		wait(1)
-		Button.Text = name
-	end)
+    -- Linha de status colorida lateral
+    local StatusLine = Instance.new("Frame")
+    StatusLine.Size = UDim2.new(0, 4, 1, 0)
+    StatusLine.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+    StatusLine.BorderSizePixel = 0
+    StatusLine.Parent = Button
+    Instance.new("UICorner").Parent = StatusLine
+
+    Button.MouseButton1Click:Connect(function()
+        active = not active
+        
+        if active then
+            -- Ativado
+            Button.Text = name .. ": ON"
+            TweenService:Create(Button, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(50, 60, 50)}):Play()
+            TweenService:Create(StatusLine, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(50, 255, 100)}):Play()
+            
+            -- Executa o script em loop enquanto 'active' for true
+            task.spawn(function()
+                while active do
+                    scriptFunc()
+                    task.wait(0.1) -- Delay pequeno para não travar o jogo
+                end
+            end)
+        else
+            -- Desativado
+            Button.Text = name .. ": OFF"
+            TweenService:Create(Button, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(40, 40, 45)}):Play()
+            TweenService:Create(StatusLine, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(255, 50, 50)}):Play()
+        end
+    end)
 end
 
 -----------------------------------------------------------
--- ADICIONE SEUS SCRIPTS ABAIXO
+-- ADICIONE SEUS SCRIPTS AQUI
 -----------------------------------------------------------
 
--- Seu script original de Luck Potion
-CreateButton("Auto Super Luck", function()
-	while task.wait(0) do
-		game:GetService("ReplicatedStorage").Events.InventoryEvent:FireServer("Equip","Super Luck Potion","Usable")
-	end
+-- 1. Script de Luck Potion (Agora como interruptor)
+CreateToggle("Super Luck", function()
+    game:GetService("ReplicatedStorage").Events.InventoryEvent:FireServer("Equip", "Super Luck Potion", "Usable")
 end)
 
--- Exemplo de como adicionar um futuro script rapidamente:
-CreateButton("Futuro Script Aqui", function()
-	print("Este botão está pronto para um novo script!")
+-- 2. Exemplo de outro script futuro
+CreateToggle("Auto Clicker", function()
+    print("Clicking...")
 end)
 
 -----------------------------------------------------------
--- SISTEMA DE DRAG (ARRASTAR O MENU COM O MOUSE)
+-- SISTEMA DE ARRASTAR (DRAG)
 -----------------------------------------------------------
 local dragging, dragInput, dragStart, startPos
 MainFrame.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		dragging = true
-		dragStart = input.Position
-		startPos = MainFrame.Position
-	end
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+    end
 end)
 UserInputService.InputChanged:Connect(function(input)
-	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-		local delta = input.Position - dragStart
-		MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-	end
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
 end)
 UserInputService.InputEnded:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
 end)
