@@ -260,73 +260,13 @@ AddGameTab("HORROR RNG", {
     }
 })
 
--- Serviços Necessários
-local UserInputService = game:GetService("UserInputService")
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local Camera = workspace.CurrentCamera
-
--- Variáveis de Controle para o Fly
-local flying = false
-local bv = nil
-
 -- ABA 3: SCRIPTS GERAIS (UNIVERSAL)
 AddGameTab("UNIVERSAL", {
-    {
-        Name = "Fly", 
-        Func = function() 
-            -- Alterna o estado de voo (Toggle)
-            flying = not flying
-            
-            local char = LocalPlayer.Character
-            local root = char and char:FindFirstChild("HumanoidRootPart")
-            
-            if flying and root then
-                -- Cria o BodyVelocity
-                bv = Instance.new("BodyVelocity")
-                bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-                bv.Velocity = Vector3.new(0,0,0)
-                bv.Parent = root
-                
-                print("Fly Ativado")
-                
-                task.spawn(function()
-                    while flying and root and root.Parent do
-                        local dir = Vector3.new(0,0,0)
-                        
-                        -- Verifica teclas pressionadas para direção
-                        if UserInputService:IsKeyDown(Enum.KeyCode.W) then dir = dir + Camera.CFrame.LookVector end
-                        if UserInputService:IsKeyDown(Enum.KeyCode.S) then dir = dir - Camera.CFrame.LookVector end
-                        if UserInputService:IsKeyDown(Enum.KeyCode.A) then dir = dir - Camera.CFrame.RightVector end
-                        if UserInputService:IsKeyDown(Enum.KeyCode.D) then dir = dir + Camera.CFrame.RightVector end
-                        
-                        bv.Velocity = dir * 70 -- Velocidade do voo
-                        task.wait()
-                    end
-                    -- Limpeza ao desligar
-                    if bv then bv:Destroy() end
-                    print("Fly Desativado")
-                end)
-            else
-                flying = false -- Garante que o loop pare se root não existir
-            end
-        end
-    },
-    {
-        Name = "Super Speed", 
-        Func = function() 
-            local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid")
-            if hum then
-                -- Alterna entre velocidade rápida e normal
-                hum.WalkSpeed = (hum.WalkSpeed == 16 and 100 or 16)
-                print("Velocidade: " .. hum.WalkSpeed)
-            end
-        end
-    },
+    {Name = "Super Speed", Func = function() print("Speed EM BREVE") end},
+    {Name = "Fly", Func = function() print("Fly EM BREVE") end},
     {Name = "No Clip", Func = function() print("No Clip EM BREVE") end},
     {Name = "Tp Click", Func = function() print("Tp Click EM BREVE") end}
 })
-
 
 -- ABA 4: BLOX FRUITS
 local ListFruit = {
