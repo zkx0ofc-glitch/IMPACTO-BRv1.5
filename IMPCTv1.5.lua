@@ -269,8 +269,51 @@ AddGameTab("UNIVERSAL", {
 })
 
 -- ABA 4: BLOX FRUITS
+
+local ListFruit = {
+    'Diamond','Light-Light','Shadow-Shadow','Portal-Portal','Spider-Spider','Gravity-Gravity',
+    'Spin-Spin','Revive-Revive','Bird-Bird: Phoenix','Rubber-Rubber','Spring-Spring',
+    'Blizzard-Blizzard','Dough-Dough','Bomb-Bomb','Venom-Venom','Bird-Bird: Falcon',
+    'Spirit-Spirit','Love-Love','Leopard-Leopard','Dragon-Dragon','Spike-Spike',
+    'Magma-Magma','Control-Control','Flame-Flame','Rumble-Rumble','Dark-Dark',
+    'Chop-Chop','Quake-Quake','Buddha-Buddha','Barrier-Barrier',"Rocket-Rocket",
+    "Sound-Sound","Pain-Pain","Mammoth-Mammoth","Kitsune-Kitsune","T-Rex-T-Rex"
+}
+
 AddGameTab("BLOX FRUITS", {
-    {Name = "Auto Farm", Func = function() print("Blox Fruits Farm EM BREVE") end}
+    {
+        Name = "Ver Frutas no Chão", 
+        Func = function() 
+            local found = false
+            for _, v in pairs(workspace:GetChildren()) do
+                if v:IsA("Tool") and v.Name:find("Fruit") then
+                    print("🍎 FRUTA ENCONTRADA: " .. v.Name .. " em " .. tostring(v.Handle.Position))
+                    found = true
+                end
+            end
+            if not found then print("❌ Nenhuma fruta spawnada no servidor.") end
+        end
+    },
+    {
+        Name = "Ver Estoque (Loja)", 
+        Func = function() 
+            -- Tenta ler o estoque remoto do jogo
+            local success, stock = pcall(function() 
+                return game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("GetFruits") 
+            end)
+            
+            if success and stock then
+                print("--- 🏪 ESTOQUE ATUAL ---")
+                for _, fruit in pairs(stock) do
+                    if fruit.OnSale then
+                        print("✅ " .. fruit.Name .. " | Preço: $" .. fruit.Price)
+                    end
+                end
+            else
+                print("⚠️ Não foi possível ler o estoque (Você precisa estar no jogo).")
+            end
+        end
+    }
 })
 
 -----------------------------------------------------------
