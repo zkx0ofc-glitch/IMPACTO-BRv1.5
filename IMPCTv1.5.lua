@@ -150,7 +150,7 @@ end
 -----------------------------------------------------------
 
 -- ABA 1: HORROR RNG
-AddGameTab("HORROR RNG", {
+AddGameTab("TEste", {
     {
         Name = "Super Luck", 
         Func = function() 
