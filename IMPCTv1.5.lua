@@ -262,10 +262,58 @@ AddGameTab("HORROR RNG", {
 
 -- ABA 3: SCRIPTS GERAIS (UNIVERSAL)
 AddGameTab("UNIVERSAL", {
-    {Name = "Super Speed", Func = function() print("Speed EM BREVE") end},
-    {Name = "Fly", Func = function() print("Fly EM BREVE") end},
-    {Name = "No Clip", Func = function() print("No Clip EM BREVE") end},
-    {Name = "Tp Click", Func = function() print("Tp Click EM BREVE") end}
+    {
+        Name = "Fly", 
+        Func = function() 
+            local player = game.Players.LocalPlayer
+            local mouse = player:GetMouse()
+            local character = player.Character or player.CharacterAdded:Wait()
+            local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+            
+            -- Variáveis de controle
+            local flying = true
+            local speed = 50
+            
+            -- Criando forças para manter o personagem no ar
+            local bodyVelocity = Instance.new("BodyVelocity", humanoidRootPart)
+            bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+            bodyVelocity.Velocity = Vector3.new(0, 0.1, 0)
+            
+            local bodyGyro = Instance.new("BodyGyro", humanoidRootPart)
+            bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+            bodyGyro.CFrame = humanoidRootPart.CFrame
+
+            -- Loop de movimento
+            task.spawn(function()
+                while flying and task.wait() do
+                    -- Direção baseada na câmera
+                    bodyVelocity.Velocity = game.Workspace.CurrentCamera.CFrame.LookVector * speed
+                    bodyGyro.CFrame = game.Workspace.CurrentCamera.CFrame
+                end
+            end)
+
+            print("Fly Ativado! (Script funcional simples)")
+        end
+    },
+    {
+        Name = "Super Speed", 
+        Func = function() 
+            game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 100 
+            print("Velocidade alterada para 100")
+        end
+    },
+    {
+        Name = "No Clip", 
+        Func = function() 
+            print("No Clip EM BREVE - Requer loop Stepped") 
+        end
+    },
+    {
+        Name = "Tp Click", 
+        Func = function() 
+            print("Tp Click EM BREVE - Requer Tool ou Mouse.Button1Down") 
+        end
+    }
 })
 
 -- ABA 4: BLOX FRUITS
