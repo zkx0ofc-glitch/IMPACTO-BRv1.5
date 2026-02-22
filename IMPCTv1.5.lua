@@ -103,9 +103,15 @@ CreateToggle("Super Luck", function()
     game:GetService("ReplicatedStorage").Events.InventoryEvent:FireServer("Equip", "Super Luck Potion", "Usable")
 end)
 
--- 2. Exemplo de outro script futuro
-CreateToggle("Auto Clicker", function()
-    print("Clicking...")
+-- 2. NOVO SCRIPT: SPEED (VELOCIDADE)
+
+local WalkSpeedValue = 100 -- Altere aqui a velocidade desejada
+
+CreateToggle("Speed Hack", function()
+    local player = game.Players.LocalPlayer
+    if player.Character and player.Character:FindFirstChild("Humanoid") then
+        player.Character.Humanoid.WalkSpeed = WalkSpeedValue
+    end
 end)
 
 -----------------------------------------------------------
