@@ -103,30 +103,33 @@ CreateToggle("Super Luck", function()
     game:GetService("ReplicatedStorage").Events.InventoryEvent:FireServer("Equip", "Super Luck Potion", "Usable")
 end)
 
--- 2. NOVO SCRIPT: SPEED (VELOCIDADE)
+-- Script de Velocidade com Caixa de Texto
+local WalkSpeedValue = 100 -- Valor padrão inicial
 
-local WalkSpeedValue = 100 -- Altere aqui a velocidade desejada
-local SpeedActive = false -- Variável de controle local
+-- Caixa de texto para definir a velocidade
+CreateTextBox("Digitar Velocidade", function(texto)
+    local num = tonumber(texto)
+    if num then
+        WalkSpeedValue = num
+        print("Velocidade definida para: " .. WalkSpeedValue)
+    else
+        print("Por favor, digite apenas números")
+    end
+end)
 
-CreateToggle("Speed Hack", function()
-    SpeedActive = not SpeedActive -- Alterna o estado interno
-    
+-- Toggle para aplicar a velocidade
+CreateToggle("Ativar Speed Hack", function(state)
     local player = game.Players.LocalPlayer
-    
-    task.spawn(function()
-        -- Enquanto estiver ativo, mantém a velocidade (evita que o jogo resete)
-        while SpeedActive do
-            if player.Character and player.Character:FindFirstChild("Humanoid") then
-                player.Character.Humanoid.WalkSpeed = WalkSpeedValue
-            end
-            task.wait(0.1)
+    if state then
+        if player.Character and player.Character:FindFirstChild("Humanoid") then
+            player.Character.Humanoid.WalkSpeed = WalkSpeedValue
         end
-        
-        -- Quando sair do loop (botão OFF), volta ao normal
+    else
+        -- Volta para a velocidade padrão do Roblox ao desativar
         if player.Character and player.Character:FindFirstChild("Humanoid") then
             player.Character.Humanoid.WalkSpeed = 16
         end
-    end)
+    end
 end)
 
 
