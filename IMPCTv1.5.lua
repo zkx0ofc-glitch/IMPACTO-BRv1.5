@@ -103,35 +103,29 @@ CreateToggle("Super Luck", function()
     game:GetService("ReplicatedStorage").Events.InventoryEvent:FireServer("Equip", "Super Luck Potion", "Usable")
 end)
 
--- Script de Velocidade com Caixa de Texto
-local WalkSpeedValue = 100 -- Valor padrão inicial
+-- 2. Scripts Futuros
 
--- Caixa de texto para definir a velocidade
-CreateTextBox("Digitar Velocidade", function(texto)
-    local num = tonumber(texto)
-    if num then
-        WalkSpeedValue = num
-        print("Velocidade definida para: " .. WalkSpeedValue)
-    else
-        print("Por favor, digite apenas números")
-    end
+CreateToggle("Super Speed (EM BREVE)", function()
+    print("EM BREVE")
 end)
 
--- Toggle para aplicar a velocidade
-CreateToggle("Ativar Speed Hack", function(state)
-    local player = game.Players.LocalPlayer
-    if state then
-        if player.Character and player.Character:FindFirstChild("Humanoid") then
-            player.Character.Humanoid.WalkSpeed = WalkSpeedValue
-        end
-    else
-        -- Volta para a velocidade padrão do Roblox ao desativar
-        if player.Character and player.Character:FindFirstChild("Humanoid") then
-            player.Character.Humanoid.WalkSpeed = 16
-        end
-    end
+-- 3. Scripts Futuros
+
+CreateToggle("Fly (EM BREVE)", function()
+    print("EM BREVE")
 end)
 
+-- 4. Scripts Futuros
+
+CreateToggle("No CLip (EM BREVE)", function()
+    print("EM BREVE")
+end)
+
+-- 5. Scripts Futuros
+
+CreateToggle("Tp CLick (EM BREVE)", function()
+    print("EM BREVE")
+end)
 
 -----------------------------------------------------------
 -- SISTEMA DE ARRASTAR (DRAG)
