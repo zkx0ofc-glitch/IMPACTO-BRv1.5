@@ -1,7 +1,7 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-    Name = "IMPACTO BR v1.1",
+    Name = "IMPACTO BR v1.2",
     LoadingTitle = "Obrigado Pelo Apoio!!",
     LoadingSubtitle = "By Duuio",
     ConfigurationSaving = {
