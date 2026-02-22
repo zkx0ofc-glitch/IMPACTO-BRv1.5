@@ -160,84 +160,102 @@ local function AddGameTab(gameName, scriptList)
 end
 
 -----------------------------------------------------------
--- LOGICA DO AIMLOCK (FORA DO LOOP PARA MAIOR FLUIDEZ)
+-- LÓGICA DO AIMLOCK LISTA (ZERO DELAY)
 -----------------------------------------------------------
 local TargetPlayer = nil
 local LockActive = false
 local Camera = workspace.CurrentCamera
-local RunService = game:GetService("RunService")
 
--- Usa RenderStepped para atualizar na mesma velocidade que o monitor (60Hz/144Hz+)
-RunService.RenderStepped:Connect(function()
+-- Rodando a 60FPS+ para grudar sem delay
+game:GetService("RunService").RenderStepped:Connect(function()
     if LockActive and TargetPlayer and TargetPlayer.Character then
         local head = TargetPlayer.Character:FindFirstChild("Head")
         if head then
-            -- Atribuição direta sem Lerp = Gruda instantaneamente
             Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, head.Position)
-        else
-            -- Se o player morrer ou sumir, destrava automaticamente
-            LockActive = false
-            TargetPlayer = nil
         end
+    else
+        LockActive = false
     end
 end)
+
+-----------------------------------------------------------
+-- FUNÇÃO PARA CRIAR A LISTA DE PLAYERS NA ABA
+-----------------------------------------------------------
+local function CreatePlayerList(parent)
+    local ListContainer = Instance.new("ScrollingFrame")
+    ListContainer.Size = UDim2.new(1, 0, 1, 0)
+    ListContainer.BackgroundTransparency = 1
+    ListContainer.ScrollBarThickness = 2
+    ListContainer.Parent = parent
+    
+    local Layout = Instance.new("UIListLayout", ListContainer)
+    Layout.Padding = UDim.new(0, 5)
+
+    local function UpdateButtons()
+        for _, child in pairs(ListContainer:GetChildren()) do
+            if child:IsA("TextButton") then child:Destroy() end
+        end
+
+        for _, p in pairs(game.Players:GetPlayers()) do
+            if p ~= game.Players.LocalPlayer then
+                local btn = Instance.new("TextButton")
+                btn.Size = UDim2.new(1, -5, 0, 35)
+                btn.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
+                btn.Text = p.DisplayName
+                btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+                btn.Font = Enum.Font.Gotham
+                btn.TextSize = 12
+                btn.Parent = ListContainer
+                Instance.new("UICorner", btn)
+
+                btn.MouseButton1Click:Connect(function()
+                    if TargetPlayer == p then
+                        TargetPlayer = nil
+                        LockActive = false
+                        btn.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
+                        btn.Text = p.DisplayName
+                    else
+                        TargetPlayer = p
+                        LockActive = true
+                        -- Limpa outros botões
+                        for _, b in pairs(ListContainer:GetChildren()) do
+                            if b:IsA("TextButton") then 
+                                b.BackgroundColor3 = Color3.fromRGB(45, 45, 50) 
+                            end
+                        end
+                        btn.BackgroundColor3 = Color3.fromRGB(50, 200, 100) -- Verde
+                        btn.Text = "LOCKED: " .. p.DisplayName
+                    end
+                end)
+            end
+        end
+    end
+
+    game.Players.PlayerAdded:Connect(UpdateButtons)
+    game.Players.PlayerRemoving:Connect(UpdateButtons)
+    UpdateButtons()
+end
 
 -----------------------------------------------------------
 -- ADICIONE SEUS JOGOS E SCRIPTS AQUI
 -----------------------------------------------------------
 
--- ABA 1: HORROR RNG
+-- ABA 1: COMBAT (INTEGRADA COM LISTA)
+local CombatPage = nil
+AddGameTab("COMBAT", {}) -- Criamos a aba vazia primeiro
+
+-- Pegamos a página criada para injetar a lista customizada
+for _, child in pairs(PagesContainer:GetChildren()) do
+    if child:IsA("ScrollingFrame") then CombatPage = child end
+end
+CreatePlayerList(CombatPage) -- Injeta a lista de players aqui
+
+-- ABA 2: HORROR RNG
 AddGameTab("HORROR RNG", {
     {
         Name = "Super Luck", 
         Func = function() 
             game:GetService("ReplicatedStorage").Events.InventoryEvent:FireServer("Equip", "Super Luck Potion", "Usable")
-        end
-    }
-})
-
--- ABA: COMBAT
-AddGameTab("COMBAT", {
-    {
-        Name = "Aimlock Cam (L)", 
-        Func = function()
-            -- Inicializa o listener de teclado apenas uma vez
-            if not _G.AimInitialized then
-                _G.AimInitialized = true
-                UserInputService.InputBegan:Connect(function(input, proc)
-                    if proc then return end
-                    
-                    if input.KeyCode == Enum.KeyCode.L then
-                        if LockActive then
-                            LockActive = false
-                            TargetPlayer = nil
-                        else
-                            -- Busca o player MAIS PRÓXIMO do centro da tela/mouse
-                            local mouse = game.Players.LocalPlayer:GetMouse()
-                            local closest = nil
-                            local shortestDist = 200 -- Raio de alcance do clique
-                            
-                            for _, p in pairs(game.Players:GetPlayers()) do
-                                if p ~= game.Players.LocalPlayer and p.Character and p.Character:FindFirstChild("Head") then
-                                    local pos, onScreen = Camera:WorldToViewportPoint(p.Character.Head.Position)
-                                    if onScreen then
-                                        local distance = (Vector2.new(mouse.X, mouse.Y) - Vector2.new(pos.X, pos.Y)).Magnitude
-                                        if distance < shortestDist then
-                                            shortestDist = distance
-                                            closest = p
-                                        end
-                                    end
-                                end
-                            end
-                            
-                            if closest then
-                                TargetPlayer = closest
-                                LockActive = true
-                            end
-                        end
-                    end
-                end)
-            end
         end
     }
 })
