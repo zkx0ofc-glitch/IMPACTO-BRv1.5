@@ -64,25 +64,7 @@ end
 -- Main Auto Farm Loop
 local function autoFarm()
     while autoFarmEnabled do
-        teleportToPosition(Vector3.new(139.45489501953125, -85.32718658447266, -263.533447265625))
-        wait(3)
-        interactWithProximityPrompt("getNil('Game', 'DataModel').Workspace.MapFolder.Obby_CrystalCaves.PromptPart.ProximityPrompt")
-        wait(5)
-
-        teleportToPosition(Vector3.new(18.52592658996582, -87.82718658447266, -26.418466567993164))
-        wait(3)
-        interactWithProximityPrompt("getNil('Game', 'DataModel').Workspace.MapFolder.Obby_FloodedCaves.PromptPart.ProximityPrompt")
-        wait(5)
-
-        teleportToPosition(Vector3.new(150.34710693359375, -87.82718658447266, 11.305421829223633))
-        wait(3)
-        interactWithProximityPrompt("getNil('Game', 'DataModel').Workspace.MapFolder.Obby_CrystalCaves.PromptPart.ProximityPrompt")
-        wait(3)
-
-        teleportToPosition(Vector3.new(171.65078735351562, -85.32718658447266, -61.73625183105469))
-        wait(3)
-        interactWithProximityPrompt("getNil('Game', 'DataModel').Workspace.MapFolder.Obby_FloodedCaves.PromptPart.ProximityPrompt")
-        wait(20)
+       while wait(0) do game:GetService("ReplicatedStorage").Events.InventoryEvent:FireServer("Equip","Super Luck Potion","Usable") end)
     end
 end
 
@@ -92,14 +74,14 @@ local function autoUsePotions()
         -- Use "Broken Dreams" potion
         local args = {
             [1] = "use_potion",
-            [2] = "Broken Dreams"
+            [2] = "Luck Potion"
         }
         game:GetService("ReplicatedStorage").CORE_RemoteEvents.SendEquipRequest:FireServer(unpack(args))
 
         -- Use "Mega Sunburst" potion
         local args = {
             [1] = "use_potion",
-            [2] = "Mega Sunburst"
+            [2] = "Super Luck Potion"
         }
         game:GetService("ReplicatedStorage").CORE_RemoteEvents.SendEquipRequest:FireServer(unpack(args))
 
