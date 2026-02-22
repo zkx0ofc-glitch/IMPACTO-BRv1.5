@@ -240,9 +240,9 @@ end
 -- ADICIONE SEUS JOGOS E SCRIPTS AQUI
 -----------------------------------------------------------
 
--- ABA 1: COMBAT (INTEGRADA COM LISTA)
+-- ABA 1: ALL BATTLEGROUNDS (INTEGRADA COM LISTA)
 local CombatPage = nil
-AddGameTab("COMBAT", {}) -- Criamos a aba vazia primeiro
+AddGameTab("AIMLOCK", {}) -- Criamos a aba vazia primeiro
 
 -- Pegamos a página criada para injetar a lista customizada
 for _, child in pairs(PagesContainer:GetChildren()) do
