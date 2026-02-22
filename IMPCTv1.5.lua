@@ -173,7 +173,64 @@ AddGameTab("HORROR RNG", {
     }
 })
 
--- ABA 2: SCRIPTS GERAIS (UNIVERSAL)
+-- ABA 2: COMBAT (NOVO!)
+local SelectedPlayer = nil
+local Locked = false
+
+AddGameTab("COMBAT", {
+    {
+        Name = "Aimlock Cam (Click)", 
+        Func = function()
+            local Player = game.Players.LocalPlayer
+            local Mouse = Player:GetMouse()
+            local Camera = workspace.CurrentCamera
+            
+            -- Função para achar player mais próximo do mouse
+            local function GetClosestPlayer()
+                local Target = nil
+                local Distance = math.huge
+                for _, v in pairs(game.Players:GetPlayers()) do
+                    if v ~= Player and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+                        local Pos, OnScreen = Camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
+                        if OnScreen then
+                            local MouseDist = (Vector2.new(Mouse.X, Mouse.Y) - Vector2.new(Pos.X, Pos.Y)).Magnitude
+                            if MouseDist < Distance and MouseDist < 100 then -- Raio de 100 pixels do mouse
+                                Distance = MouseDist
+                                Target = v
+                            end
+                        end
+                    end
+                end
+                return Target
+            end
+
+            -- Listener da tecla L (Só registra uma vez)
+            if not _G.AimConnection then
+                _G.AimConnection = UserInputService.InputBegan:Connect(function(input, proc)
+                    if proc then return end
+                    if input.KeyCode == Enum.KeyCode.L then
+                        if Locked then
+                            Locked = false
+                            SelectedPlayer = nil
+                        else
+                            SelectedPlayer = GetClosestPlayer()
+                            if SelectedPlayer then Locked = true end
+                        end
+                    end
+                end)
+            end
+
+            -- Execução do Lock (Acontece no loop de 0.1s do seu Toggle)
+            if Locked and SelectedPlayer and SelectedPlayer.Character and SelectedPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                Camera.CFrame = CFrame.new(Camera.CFrame.Position, SelectedPlayer.Character.HumanoidRootPart.Position)
+            else
+                Locked = false
+            end
+        end
+    }
+})
+
+-- ABA 3: SCRIPTS GERAIS (UNIVERSAL)
 AddGameTab("UNIVERSAL", {
     {Name = "Super Speed", Func = function() print("Speed EM BREVE") end},
     {Name = "Fly", Func = function() print("Fly EM BREVE") end},
@@ -181,7 +238,7 @@ AddGameTab("UNIVERSAL", {
     {Name = "Tp Click", Func = function() print("Tp Click EM BREVE") end}
 })
 
--- ABA 3: BLOX FRUITS
+-- ABA 4: BLOX FRUITS
 AddGameTab("BLOX FRUITS", {
     {Name = "Auto Farm", Func = function() print("Blox Fruits Farm EM BREVE") end}
 })
