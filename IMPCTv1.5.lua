@@ -179,7 +179,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
 end)
 
 -----------------------------------------------------------
--- FUNÇÃO PARA CRIAR A LISTA DE PLAYERS NA ABA
+-- FUNÇÃO PARA CRIAR A LISTA DE PLAYERS NA ABA 
 -----------------------------------------------------------
 local function CreatePlayerList(parent)
     local ListContainer = Instance.new("ScrollingFrame")
