@@ -1,7 +1,6 @@
 -- SERVIÇOS
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
-local VirtualInputManager = game:GetService("VirtualInputManager") -- Simula teclado
 
 -- CONFIGURAÇÃO DA GUI
 local ScreenGui = Instance.new("ScreenGui")
@@ -12,7 +11,7 @@ ScreenGui.ResetOnSpawn = false
 local MainFrame = Instance.new("Frame")
 MainFrame.Size = UDim2.new(0, 260, 0, 380)
 MainFrame.Position = UDim2.new(0.5, -130, 0.5, -190)
-MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
 MainFrame.Parent = ScreenGui
 
 local UICorner = Instance.new("UICorner")
@@ -21,10 +20,10 @@ UICorner.Parent = MainFrame
 
 local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, 0, 0, 50)
-Title.Text = "PREMIUM HUB"
+Title.Text = "MODERN HUB"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.Font = Enum.Font.GothamBold
-Title.TextSize = 18
+Title.TextSize = 20
 Title.BackgroundTransparency = 1
 Title.Parent = MainFrame
 
@@ -33,6 +32,7 @@ ButtonList.Size = UDim2.new(1, -20, 1, -70)
 ButtonList.Position = UDim2.new(0, 10, 0, 60)
 ButtonList.BackgroundTransparency = 1
 ButtonList.ScrollBarThickness = 2
+ButtonList.CanvasSize = UDim2.new(0, 0, 0, 0)
 ButtonList.Parent = MainFrame
 
 local UIListLayout = Instance.new("UIListLayout")
@@ -41,7 +41,7 @@ UIListLayout.Padding = UDim.new(0, 10)
 UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
 -----------------------------------------------------------
--- FUNÇÃO DE CRIAÇÃO DE INTERRUPTOR
+-- SISTEMA DE INTERRUPTORES (TOGGLES)
 -----------------------------------------------------------
 
 local function CreateToggle(name, scriptFunc)
@@ -49,9 +49,9 @@ local function CreateToggle(name, scriptFunc)
     
     local Button = Instance.new("TextButton")
     Button.Size = UDim2.new(1, -10, 0, 45)
-    Button.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
-    Button.Text = name .. " [OFF]"
-    Button.TextColor3 = Color3.fromRGB(150, 150, 150)
+    Button.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+    Button.Text = name .. ": OFF"
+    Button.TextColor3 = Color3.fromRGB(200, 200, 200)
     Button.Font = Enum.Font.GothamMedium
     Button.TextSize = 14
     Button.AutoButtonColor = false
@@ -61,45 +61,55 @@ local function CreateToggle(name, scriptFunc)
     Corner.CornerRadius = UDim.new(0, 8)
     Corner.Parent = Button
 
+    -- Linha de status colorida lateral
+    local StatusLine = Instance.new("Frame")
+    StatusLine.Size = UDim2.new(0, 4, 1, 0)
+    StatusLine.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+    StatusLine.BorderSizePixel = 0
+    StatusLine.Parent = Button
+    Instance.new("UICorner").Parent = StatusLine
+
     Button.MouseButton1Click:Connect(function()
         active = not active
         
         if active then
-            Button.Text = name .. " [ON]"
-            TweenService:Create(Button, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(40, 80, 40), TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+            -- Ativado
+            Button.Text = name .. ": ON"
+            TweenService:Create(Button, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(50, 60, 50)}):Play()
+            TweenService:Create(StatusLine, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(50, 255, 100)}):Play()
             
+            -- Executa o script em loop enquanto 'active' for true
             task.spawn(function()
                 while active do
                     scriptFunc()
-                    task.wait(0.1) -- Ajuste a velocidade aqui
+                    task.wait(0.1) -- Delay pequeno para não travar o jogo
                 end
             end)
         else
-            Button.Text = name .. " [OFF]"
-            TweenService:Create(Button, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(35, 35, 40), TextColor3 = Color3.fromRGB(150, 150, 150)}):Play()
+            -- Desativado
+            Button.Text = name .. ": OFF"
+            TweenService:Create(Button, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(40, 40, 45)}):Play()
+            TweenService:Create(StatusLine, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(255, 50, 50)}):Play()
         end
     end)
 end
 
 -----------------------------------------------------------
--- SCRIPTS DOS BOTÕES
+-- ADICIONE SEUS SCRIPTS AQUI
 -----------------------------------------------------------
 
--- 1. Script de Super Luck
+-- 1. Script de Luck Potion (Agora como interruptor)
 CreateToggle("Super Luck", function()
     game:GetService("ReplicatedStorage").Events.InventoryEvent:FireServer("Equip", "Super Luck Potion", "Usable")
 end)
 
--- 2. Script de Auto Roll (Aperta a tecla E)
-CreateToggle("Auto Roll", function()
-    -- Simula apertar e soltar a tecla E
-    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
-    task.wait(0.05)
-    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+-- 2. Exemplo de outro script futuro
+CreateToggle("Auto Clicker", function()
+    print("Clicking...")
 end)
 
 -----------------------------------------------------------
--- SISTEMA DE MOVIMENTAÇÃO (DRAG)
+-- SISTEMA DE ARRASTAR (DRAG)
 -----------------------------------------------------------
 local dragging, dragInput, dragStart, startPos
 MainFrame.InputBegan:Connect(function(input)
