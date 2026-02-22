@@ -150,7 +150,7 @@ end
 -----------------------------------------------------------
 
 -- ABA 1: PET SIMULATOR 99
-AddGameTab("PET SIM 99", {
+AddGameTab("Horror RNG", {
     {
         Name = "Super Luck", 
         Func = function() 
