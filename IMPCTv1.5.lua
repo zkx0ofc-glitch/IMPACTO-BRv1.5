@@ -149,7 +149,7 @@ end
 -- ADICIONE SEUS JOGOS E SCRIPTS AQUI
 -----------------------------------------------------------
 
--- ABA 1: PET SIMULATOR 99
+-- ABA 1: HORROR RNG
 AddGameTab("Horror RNG", {
     {
         Name = "Super Luck", 
