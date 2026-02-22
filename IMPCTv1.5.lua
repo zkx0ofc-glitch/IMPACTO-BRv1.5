@@ -165,15 +165,19 @@ end
 local TargetPlayer = nil
 local LockActive = false
 local Camera = workspace.CurrentCamera
+local RunService = game:GetService("RunService")
 
--- Conexão de 60 FPS para a câmera ficar lisa
-game:GetService("RunService").RenderStepped:Connect(function()
+-- Usa RenderStepped para atualizar na mesma velocidade que o monitor (60Hz/144Hz+)
+RunService.RenderStepped:Connect(function()
     if LockActive and TargetPlayer and TargetPlayer.Character then
         local head = TargetPlayer.Character:FindFirstChild("Head")
         if head then
-            local smoothness = 0.15 -- Ajuste entre 0.1 e 1 (quanto menor, mais suave)
-            local targetRotation = CFrame.lookAt(Camera.CFrame.Position, head.Position)
-            Camera.CFrame = Camera.CFrame:Lerp(targetRotation, smoothness)
+            -- Atribuição direta sem Lerp = Gruda instantaneamente
+            Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, head.Position)
+        else
+            -- Se o player morrer ou sumir, destrava automaticamente
+            LockActive = false
+            TargetPlayer = nil
         end
     end
 end)
@@ -197,28 +201,29 @@ AddGameTab("COMBAT", {
     {
         Name = "Aimlock Cam (L)", 
         Func = function()
-            -- Este Toggle apenas permite que a tecla L funcione
+            -- Inicializa o listener de teclado apenas uma vez
             if not _G.AimInitialized then
                 _G.AimInitialized = true
                 UserInputService.InputBegan:Connect(function(input, proc)
                     if proc then return end
+                    
                     if input.KeyCode == Enum.KeyCode.L then
                         if LockActive then
                             LockActive = false
                             TargetPlayer = nil
                         else
-                            -- Busca o player mais próximo da mira do mouse
+                            -- Busca o player MAIS PRÓXIMO do centro da tela/mouse
                             local mouse = game.Players.LocalPlayer:GetMouse()
                             local closest = nil
-                            local dist = 150 -- Raio de busca em pixels
+                            local shortestDist = 200 -- Raio de alcance do clique
                             
                             for _, p in pairs(game.Players:GetPlayers()) do
                                 if p ~= game.Players.LocalPlayer and p.Character and p.Character:FindFirstChild("Head") then
                                     local pos, onScreen = Camera:WorldToViewportPoint(p.Character.Head.Position)
                                     if onScreen then
-                                        local mDist = (Vector2.new(mouse.X, mouse.Y) - Vector2.new(pos.X, pos.Y)).Magnitude
-                                        if mDist < dist then
-                                            dist = mDist
+                                        local distance = (Vector2.new(mouse.X, mouse.Y) - Vector2.new(pos.X, pos.Y)).Magnitude
+                                        if distance < shortestDist then
+                                            shortestDist = distance
                                             closest = p
                                         end
                                     end
