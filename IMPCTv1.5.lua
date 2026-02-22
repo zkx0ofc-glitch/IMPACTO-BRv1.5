@@ -1,7 +1,7 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-    Name = "IMPACTO BR v1.2",
+    Name = "IMPACTO BR v1.1",
     LoadingTitle = "Obrigado Pelo Apoio!!",
     LoadingSubtitle = "By Duuio",
     ConfigurationSaving = {
@@ -119,7 +119,8 @@ end
 -- Function to handle Fast Roll
 local function fastRoll()
     while fastRollEnabled do
-       while wait(0) do game:GetService("ReplicatedStorage").Events.InventoryEvent:FireServer("Equip","Super Luck Potion","Usable")
+        game:GetService("ReplicatedStorage").CORE_RemoteEvents.SendSummonRequest:FireServer(5)
+        wait()
     end
 end
 
