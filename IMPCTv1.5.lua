@@ -13,11 +13,28 @@ MainFrame.Size = UDim2.new(0, 420, 0, 380)
 MainFrame.Position = UDim2.new(0.5, -210, 0.5, -190)
 MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
 MainFrame.ClipsDescendants = true
+MainFrame.Visible = true -- Começa visível
 MainFrame.Parent = ScreenGui
 
 local UICorner = Instance.new("UICorner")
 UICorner.CornerRadius = UDim.new(0, 12)
 UICorner.Parent = MainFrame
+
+-- SISTEMA DE MINIMIZAR (F4)
+local IsOpen = true
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed and input.KeyCode == Enum.KeyCode.F4 then
+        IsOpen = not IsOpen
+        if IsOpen then
+            MainFrame.Visible = true
+            MainFrame:TweenSize(UDim2.new(0, 420, 0, 380), "Out", "Quad", 0.3, true)
+        else
+            MainFrame:TweenSize(UDim2.new(0, 420, 0, 0), "In", "Quad", 0.3, true, function()
+                if not IsOpen then MainFrame.Visible = false end
+            end)
+        end
+    end
+end)
 
 -- TÍTULO E JOGO ATUAL
 local Title = Instance.new("TextLabel")
@@ -33,7 +50,7 @@ Title.Parent = MainFrame
 local GameStatus = Instance.new("TextLabel")
 GameStatus.Size = UDim2.new(0, 280, 0, 20)
 GameStatus.Position = UDim2.new(0, 130, 0, 30)
-GameStatus.Text = "Selecione um jogo ao lado"
+GameStatus.Text = "Pressione F4 para Minimizar"
 GameStatus.TextColor3 = Color3.fromRGB(150, 150, 150)
 GameStatus.Font = Enum.Font.Gotham
 GameStatus.TextSize = 12
@@ -110,7 +127,6 @@ local function CreateToggle(parent, name, scriptFunc)
 end
 
 local function AddGameTab(gameName, scriptList)
-    -- Botão da Aba
     local TabBtn = Instance.new("TextButton")
     TabBtn.Size = UDim2.new(0, 100, 0, 35)
     TabBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
@@ -121,7 +137,6 @@ local function AddGameTab(gameName, scriptList)
     TabBtn.Parent = TabContainer
     Instance.new("UICorner", TabBtn)
 
-    -- Página de Scripts desta Aba
     local Page = Instance.new("ScrollingFrame")
     Page.Size = UDim2.new(1, 0, 1, 0)
     Page.BackgroundTransparency = 1
@@ -139,7 +154,6 @@ local function AddGameTab(gameName, scriptList)
         GameStatus.Text = "Suportado em: " .. gameName
     end)
 
-    -- Criar os Toggles dentro desta página
     for _, item in ipairs(scriptList) do
         CreateToggle(Page, item.Name, item.Func)
     end
@@ -161,30 +175,15 @@ AddGameTab("HORROR RNG", {
 
 -- ABA 2: SCRIPTS GERAIS (UNIVERSAL)
 AddGameTab("UNIVERSAL", {
-    {
-        Name = "Super Speed", 
-        Func = function() print("Speed EM BREVE") end
-    },
-    {
-        Name = "Fly", 
-        Func = function() print("Fly EM BREVE") end
-    },
-    {
-        Name = "No Clip", 
-        Func = function() print("No Clip EM BREVE") end
-    },
-    {
-        Name = "Tp Click", 
-        Func = function() print("Tp Click EM BREVE") end
-    }
+    {Name = "Super Speed", Func = function() print("Speed EM BREVE") end},
+    {Name = "Fly", Func = function() print("Fly EM BREVE") end},
+    {Name = "No Clip", Func = function() print("No Clip EM BREVE") end},
+    {Name = "Tp Click", Func = function() print("Tp Click EM BREVE") end}
 })
 
--- ABA 3: EXEMPLO DE OUTRO JOGO
+-- ABA 3: BLOX FRUITS
 AddGameTab("BLOX FRUITS", {
-    {
-        Name = "Auto Farm", 
-        Func = function() print("Blox Fruits Farm EM BREVE") end
-    }
+    {Name = "Auto Farm", Func = function() print("Blox Fruits Farm EM BREVE") end}
 })
 
 -----------------------------------------------------------
