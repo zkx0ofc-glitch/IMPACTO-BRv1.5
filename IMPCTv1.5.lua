@@ -80,7 +80,7 @@ PagesContainer.BackgroundTransparency = 1
 PagesContainer.Parent = MainFrame
 
 -----------------------------------------------------------
--- SISTEMA DE INTERRUPTORES (TOGGLES) INTEGRADO
+-- SISTEMA DE INTERRUPTORES (TOGGLES) INTEGRADO 
 -----------------------------------------------------------
 local ActivePage = nil
 
